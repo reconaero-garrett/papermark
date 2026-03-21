@@ -190,6 +190,10 @@ export default function PDFViewer(props: any) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
       switch (event.key) {
         case "ArrowRight":
           goToNextPage();
@@ -202,10 +206,8 @@ export default function PDFViewer(props: any) {
       }
     };
 
-    // when the component mounts, attach the event listener
     document.addEventListener("keydown", handleKeyDown);
 
-    // when the component unmounts, detach the event listener
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -262,6 +264,20 @@ export default function PDFViewer(props: any) {
         pageNumber={pageNumber}
         numPages={numPages}
         navData={props.navData}
+        onPageNumberChange={(targetPage) => {
+          if (targetPage >= 1 && targetPage <= numPages && targetPage !== pageNumber) {
+            const duration = getActiveDuration();
+            trackPageViewSafely({
+              linkId, documentId, viewId,
+              duration,
+              pageNumber,
+              versionNumber: props.versionNumber,
+              isPreview,
+            });
+            setPageNumber(targetPage);
+            startTimeRef.current = Date.now();
+          }
+        }}
       />
       <div
         hidden={loading}

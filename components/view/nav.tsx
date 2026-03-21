@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useViewerChatSafe } from "@/ee/features/ai/components/viewer-chat-provider";
 import { Brand, DataroomBrand } from "@prisma/client";
@@ -68,6 +68,106 @@ export type TNavData = {
   onToggleAnnotations?: (enabled: boolean) => void;
 };
 
+function PageNumberInput({
+  pageNumber,
+  numPages,
+  onPageNumberChange,
+}: {
+  pageNumber: number;
+  numPages: number;
+  onPageNumberChange?: (page: number) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(String(pageNumber));
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setInputValue(String(pageNumber));
+    }
+  }, [pageNumber, isEditing]);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const commitValue = useCallback(() => {
+    const parsed = parseInt(inputValue, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= numPages && onPageNumberChange) {
+      onPageNumberChange(parsed);
+    }
+    setIsEditing(false);
+  }, [inputValue, numPages, onPageNumberChange]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commitValue();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setInputValue(String(pageNumber));
+      setIsEditing(false);
+    }
+    e.stopPropagation();
+  };
+
+  const charWidth = String(numPages).length;
+
+  if (!onPageNumberChange) {
+    return (
+      <div className="flex h-8 items-center space-x-1 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white sm:h-10 sm:px-4 sm:py-2 sm:text-sm">
+        <span style={{ fontVariantNumeric: "tabular-nums" }}>{pageNumber}</span>
+        <span className="text-gray-400">/</span>
+        <span className="text-gray-400" style={{ fontVariantNumeric: "tabular-nums" }}>
+          {numPages}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-8 items-center space-x-1 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white sm:h-10 sm:px-4 sm:py-2 sm:text-sm">
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          value={inputValue}
+          onChange={(e) => {
+            const val = e.target.value.replace(/[^0-9]/g, "");
+            setInputValue(val);
+          }}
+          onKeyDown={handleKeyDown}
+          onBlur={commitValue}
+          className="w-auto border-none bg-transparent p-0 text-center text-inherit outline-none focus:ring-0"
+          style={{
+            fontVariantNumeric: "tabular-nums",
+            width: `${charWidth + 0.5}ch`,
+          }}
+          aria-label="Go to page number"
+        />
+      ) : (
+        <button
+          onClick={() => setIsEditing(true)}
+          className="cursor-text border-b border-dashed border-gray-500 hover:border-white"
+          style={{ fontVariantNumeric: "tabular-nums" }}
+          title="Click to jump to a page"
+          aria-label={`Page ${pageNumber}, click to jump to a page`}
+        >
+          {pageNumber}
+        </button>
+      )}
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-400" style={{ fontVariantNumeric: "tabular-nums" }}>
+        {numPages}
+      </span>
+    </div>
+  );
+}
+
 export default function Nav({
   navData,
   type,
@@ -78,6 +178,7 @@ export default function Nav({
   handleZoomIn,
   handleZoomOut,
   handleFullscreen,
+  onPageNumberChange,
 }: {
   navData: TNavData;
   type?: "pdf" | "notion" | "sheet";
@@ -88,6 +189,7 @@ export default function Nav({
   handleZoomIn?: () => void;
   handleZoomOut?: () => void;
   handleFullscreen?: () => void;
+  onPageNumberChange?: (page: number) => void;
 }) {
   const router = useRouter();
   const asPath = router.asPath;
@@ -444,18 +546,11 @@ export default function Nav({
             )}
 
             {pageNumber && numPages ? (
-              <div className="flex h-8 items-center space-x-1 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white sm:h-10 sm:px-4 sm:py-2 sm:text-sm">
-                <span style={{ fontVariantNumeric: "tabular-nums" }}>
-                  {pageNumber}
-                </span>
-                <span className="text-gray-400">/</span>
-                <span
-                  className="text-gray-400"
-                  style={{ fontVariantNumeric: "tabular-nums" }}
-                >
-                  {numPages}
-                </span>
-              </div>
+              <PageNumberInput
+                pageNumber={pageNumber}
+                numPages={numPages}
+                onPageNumberChange={onPageNumberChange}
+              />
             ) : null}
             {/* add a separator that doesn't use radix or shadcn  */}
             <div className="h-6 w-px bg-gray-800" />

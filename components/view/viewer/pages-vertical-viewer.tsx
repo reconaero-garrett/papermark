@@ -545,25 +545,29 @@ export default function PagesVerticalViewer({
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    const target = event.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
     switch (event.key) {
       case "ArrowDown":
-        event.preventDefault(); // Prevent default behavior
-        event.stopPropagation(); // Stop propagation
+        event.preventDefault();
+        event.stopPropagation();
         goToNextPage();
         break;
       case "ArrowUp":
-        event.preventDefault(); // Prevent default behavior
-        event.stopPropagation(); // Stop propagation
+        event.preventDefault();
+        event.stopPropagation();
         goToPreviousPage();
         break;
       case "ArrowRight":
-        event.preventDefault(); // Prevent default behavior
-        event.stopPropagation(); // Stop propagation
+        event.preventDefault();
+        event.stopPropagation();
         goToNextPage();
         break;
       case "ArrowLeft":
-        event.preventDefault(); // Prevent default behavior
-        event.stopPropagation(); // Stop propagation
+        event.preventDefault();
+        event.stopPropagation();
         goToPreviousPage();
         break;
       default:
@@ -783,6 +787,26 @@ export default function PagesVerticalViewer({
         handleZoomOut={handleZoomOut}
         handleFullscreen={handleFullscreen}
         navData={navData}
+        onPageNumberChange={(targetPage) => {
+          if (targetPage >= 1 && targetPage <= numPages && targetPage !== pageNumber) {
+            if (pageNumber <= numPages) {
+              const duration = getActiveDuration();
+              trackPageViewSafely({
+                linkId, documentId, viewId, duration,
+                pageNumber, versionNumber, dataroomId,
+                setViewedPages, isPreview,
+              });
+            }
+            const targetImg = imageRefs.current[targetPage - 1];
+            if (targetImg) {
+              scrollActionRef.current = true;
+              targetImg.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            setPageNumber(targetPage);
+            pageNumberRef.current = targetPage;
+            startTimeRef.current = Date.now();
+          }
+        }}
       />
       <div
         style={{ height: "calc(100dvh - 64px)" }}
