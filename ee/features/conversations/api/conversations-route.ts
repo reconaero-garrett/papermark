@@ -280,7 +280,7 @@ const routeHandlers = {
             dataroomId,
             messageId: conversation.messages[0].id,
             conversationId: conversation.id,
-            senderUserId: viewerId,
+            senderUserId: viewerId!,
             teamId: team.id,
           },
           {
