@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 
 import { TeamProvider } from "@/context/team-context";
+import { UploadProgressProvider } from "@/context/upload-progress-context";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { NuqsAdapter } from "nuqs/adapters/next/pages";
@@ -82,8 +83,10 @@ export default function App({
                     <Component {...pageProps} />
                   ) : (
                     <TeamProvider>
-                      <Component {...pageProps} />
-                      <DealflowPopup />
+                      <UploadProgressProvider>
+                        <Component {...pageProps} />
+                        <DealflowPopup />
+                      </UploadProgressProvider>
                     </TeamProvider>
                   )}
                 </TooltipProvider>
