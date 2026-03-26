@@ -207,7 +207,6 @@ export default function DocumentView({
           ipAddress,
           isTeamMember,
           agentsEnabled,
-          viewerId,
         });
         setSubmitted(true);
         setVerificationRequested(false);
