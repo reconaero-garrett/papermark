@@ -282,6 +282,7 @@ export const LinkOptions = ({
                 {...{ data, setData }}
                 isAllowed={isTrial || isDataroomsPlus}
                 handleUpgradeStateChange={handleUpgradeStateChange}
+                // @ts-expect-error
                 linkType={linkType}
               />
 
