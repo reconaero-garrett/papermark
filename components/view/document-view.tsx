@@ -159,7 +159,7 @@ export default function DocumentView({
       } else {
         const {
           viewId,
-          //viewerId,
+          viewerId,
           file,
           pages,
           sheetData,
