@@ -288,6 +288,8 @@ export const LinkOptions = ({
                 {...{ data, setData }}
                 isAllowed={isTrial || isDataroomsPlus}
                 handleUpgradeStateChange={handleUpgradeStateChange}
+                // @ts-expect-error
+                linkType={linkType}
               />
 
               {limits?.conversationsInDataroom ? (
@@ -305,6 +307,18 @@ export const LinkOptions = ({
           ) : null}
         </div>
       </CollapsibleSection>
+
+      {/* Conversation Section for Document Links */}
+      {linkType === LinkType.DOCUMENT_LINK ? (
+        <CollapsibleSection title="Q&A Conversations" defaultOpen={true}>
+          <ConversationSection
+            {...{ data, setData }}
+            isAllowed={isTrial || isPro || isBusiness || isDatarooms || isDataroomsPlus}
+            handleUpgradeStateChange={handleUpgradeStateChange}
+            linkType={linkType}
+          />
+        </CollapsibleSection>
+      ) : null}
 
       <UpgradePlanModal
         clickedPlan={upgradePlan}

@@ -168,6 +168,7 @@ export default function DocumentView({
       } else {
         const {
           viewId,
+          viewerId,
           file,
           pages,
           sheetData,
@@ -177,7 +178,7 @@ export default function DocumentView({
           verificationToken,
           agentsEnabled,
           isTeamMember,
-          viewerId,
+          viewerId: fetchedViewerId, // This renames it so it doesn't conflict
         } = fetchData as DEFAULT_DOCUMENT_VIEW_TYPE;
 
         analytics.identify(
@@ -207,6 +208,7 @@ export default function DocumentView({
 
         setViewData({
           viewId,
+          viewerId,
           file,
           pages,
           sheetData,
@@ -215,7 +217,6 @@ export default function DocumentView({
           ipAddress,
           isTeamMember,
           agentsEnabled,
-          viewerId,
         });
         setSubmitted(true);
         setVerificationRequested(false);
