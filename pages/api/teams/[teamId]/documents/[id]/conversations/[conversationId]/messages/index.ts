@@ -77,10 +77,12 @@ export default async function handler(
       }
 
       // Create the message
-      const message = await messageService.createMessage({
+      const message = await messageService.addMessage({
         conversationId,
         content: content.trim(),
         userId,
+        // viewId and viewerId are optional, but the service expects them 
+        // in the object even if they are undefined
       });
 
       // Send notification asynchronously
