@@ -169,6 +169,7 @@ export default function DocumentView({
           verificationToken,
           agentsEnabled,
           isTeamMember,
+          viewerId: fetchedViewerId, // This renames it so it doesn't conflict
         } = fetchData as DEFAULT_DOCUMENT_VIEW_TYPE;
 
         analytics.identify(
